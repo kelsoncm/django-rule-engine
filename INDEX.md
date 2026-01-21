@@ -49,7 +49,7 @@
 
 ### Código e Exemplos
 
-5. **[examples.py](./examples.py)** - 💻 Exemplos de Código (350+ linhas)
+5. **[examples.py](./EXAMPLES.md)** - 💻 Exemplos de Código (350+ linhas)
    - Exemplo 1: Uso básico
    - Exemplo 2: Com dados de exemplo
    - Exemplo 3: Validação de usuário
@@ -57,14 +57,7 @@
    - Exemplo 5: Múltiplas regras
    - Lista de regras comuns
 
-6. **[test_rule_field.py](./test_rule_field.py)** - 🧪 Suite de Testes
-   - Teste 1: Compilação de regras
-   - Teste 2: Avaliação de regras
-   - Teste 3: Validação do campo Django
-   - Teste 4: Simulação da API
-   - Teste 5: Exemplos do mundo real
-
-7. **[VISUAL_DEMO.py](./VISUAL_DEMO.py)** - 🎨 Demonstração Visual
+7. **[VISUAL_DEMO.py](./VISUAL_DEMO.md)** - 🎨 Demonstração Visual
    - Definição no modelo
    - Aparência no admin
    - Fluxo de uso

@@ -1,33 +1,32 @@
-"""
-Exemplo completo de uso do RuleField.
+# Examples 
 
-Este arquivo demonstra diferentes formas de usar o RuleField
-em seus modelos Django.
-"""
+Complete usage examples of RuleField demonstrating different ways to use RuleField in your Django models.
 
+
+```python
 from django.db import models
 from django_rule_engine.fields import RuleField
 
 
 class Exemplo1_Basico(models.Model):
-    """Exemplo básico - campo simples sem configuração adicional."""
+    """Basic example - simple field without additional configuration."""
     
     nome = models.CharField(max_length=100)
     regra = RuleField(
-        verbose_name="Regra Simples",
-        help_text="Digite uma regra do rule-engine"
+        verbose_name="Simple Rule",
+        help_text="Enter a rule-engine rule"
     )
     
     class Meta:
-        verbose_name = "Exemplo 1: Uso Básico"
+        verbose_name = "Example 1: Basic Usage"
 
 
 class Exemplo2_ComDadosExemplo(models.Model):
-    """Exemplo com dados de exemplo pré-configurados."""
+    """Example with pre-configured sample data."""
     
     nome = models.CharField(max_length=100)
     regra_validacao = RuleField(
-        verbose_name="Regra de Validação",
+        verbose_name="Validation Rule",
         example_data={
             "idade": 25,
             "status": "ativo",
@@ -37,15 +36,15 @@ class Exemplo2_ComDadosExemplo(models.Model):
     )
     
     class Meta:
-        verbose_name = "Exemplo 2: Com Dados de Exemplo"
+        verbose_name = "Example 2: With Sample Data"
 
 
 class Exemplo3_ValidacaoUsuario(models.Model):
-    """Exemplo real: validação de usuários."""
+    """Real example: user validation."""
     
     nome_grupo = models.CharField(max_length=200)
     regra_acesso = RuleField(
-        verbose_name="Regra de Acesso",
+        verbose_name="Access Rule",
         blank=True,
         null=True,
         example_data={
@@ -57,14 +56,14 @@ class Exemplo3_ValidacaoUsuario(models.Model):
             "department": "TI"
         },
         help_text=(
-            "Define quem pode acessar este grupo. "
-            "Variáveis disponíveis: username, email, is_staff, "
+            "Defines who can access this group. "
+            "Available variables: username, email, is_staff, "
             "is_active, age, department"
         )
     )
     
     def user_can_access(self, user_data):
-        """Verifica se o usuário pode acessar o grupo."""
+        """Checks if the user can access the group."""
         if not self.regra_acesso:
             return True
         
@@ -73,21 +72,21 @@ class Exemplo3_ValidacaoUsuario(models.Model):
             rule = rule_engine.Rule(self.regra_acesso)
             return rule.matches(user_data)
         except Exception as e:
-            print(f"Erro ao avaliar regra: {e}")
+            print(f"Error evaluating rule: {e}")
             return False
     
     class Meta:
-        verbose_name = "Exemplo 3: Validação de Usuário"
+        verbose_name = "Example 3: User Validation"
 
 
 class Exemplo4_RegraDesconto(models.Model):
-    """Exemplo real: regra de desconto para produtos."""
+    """Real example: discount rule for products."""
     
     nome_campanha = models.CharField(max_length=200)
     descricao = models.TextField(blank=True)
     
     regra_desconto = RuleField(
-        verbose_name="Regra de Desconto",
+        verbose_name="Discount Rule",
         example_data={
             "preco": 150.00,
             "quantidade": 3,
@@ -96,19 +95,19 @@ class Exemplo4_RegraDesconto(models.Model):
             "total_compras_ano": 5
         },
         help_text=(
-            "Define quando o desconto se aplica. "
-            "Exemplo: preco > 100 and quantidade >= 2"
+            "Defines when the discount applies. "
+            "Example: preco > 100 and quantidade >= 2"
         )
     )
     
     percentual_desconto = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        help_text="Percentual de desconto (0-100)"
+        help_text="Discount percentage (0-100)"
     )
     
     def calcular_desconto(self, pedido):
-        """Calcula o desconto baseado na regra."""
+        """Calculates the discount based on the rule."""
         if not self.regra_desconto:
             return 0
         
@@ -116,7 +115,7 @@ class Exemplo4_RegraDesconto(models.Model):
         try:
             rule = rule_engine.Rule(self.regra_desconto)
             
-            # Prepara dados do pedido
+            # Prepare order data
             dados = {
                 "preco": float(pedido.preco),
                 "quantidade": pedido.quantidade,
@@ -129,53 +128,53 @@ class Exemplo4_RegraDesconto(models.Model):
                 return float(self.percentual_desconto)
             return 0
         except Exception as e:
-            print(f"Erro ao calcular desconto: {e}")
+            print(f"Error calculating discount: {e}")
             return 0
     
     class Meta:
-        verbose_name = "Exemplo 4: Regra de Desconto"
+        verbose_name = "Example 4: Discount Rule"
 
 
 class Exemplo5_MultiplaRegras(models.Model):
-    """Exemplo com múltiplas regras no mesmo modelo."""
+    """Example with multiple rules in the same model."""
     
     nome = models.CharField(max_length=200)
     
-    # Regra de elegibilidade
+    # Eligibility rule
     regra_elegibilidade = RuleField(
-        verbose_name="Regra de Elegibilidade",
+        verbose_name="Eligibility Rule",
         example_data={
             "idade": 25,
             "formacao": "superior",
             "experiencia_anos": 3
         },
-        help_text="Define se a pessoa é elegível"
+        help_text="Defines if the person is eligible"
     )
     
-    # Regra de prioridade
+    # Priority rule
     regra_prioridade = RuleField(
-        verbose_name="Regra de Prioridade",
+        verbose_name="Priority Rule",
         example_data={
             "pontuacao": 85,
             "tempo_espera_dias": 30,
             "situacao": "regular"
         },
-        help_text="Define a prioridade no processo"
+        help_text="Defines the priority in the process"
     )
     
-    # Regra de classificação
+    # Classification rule
     regra_classificacao = RuleField(
-        verbose_name="Regra de Classificação",
+        verbose_name="Classification Rule",
         example_data={
             "nota_prova": 8.5,
             "nota_titulos": 7.0,
             "nota_experiencia": 9.0
         },
-        help_text="Define a classificação final"
+        help_text="Defines the final classification"
     )
     
     def avaliar_candidato(self, dados_candidato):
-        """Avalia o candidato em todas as regras."""
+        """Evaluates the candidate against all rules."""
         import rule_engine
         
         resultados = {
@@ -184,67 +183,66 @@ class Exemplo5_MultiplaRegras(models.Model):
             "classificacao": False
         }
         
-        # Avalia elegibilidade
+        # Evaluate eligibility
         if self.regra_elegibilidade:
             try:
                 rule = rule_engine.Rule(self.regra_elegibilidade)
                 resultados["elegivel"] = rule.matches(dados_candidato)
             except Exception as e:
-                print(f"Erro ao avaliar elegibilidade: {e}")
+                print(f"Error evaluating eligibility: {e}")
         
-        # Avalia prioridade (só se for elegível)
+        # Evaluate priority (only if eligible)
         if resultados["elegivel"] and self.regra_prioridade:
             try:
                 rule = rule_engine.Rule(self.regra_prioridade)
                 resultados["prioridade"] = rule.matches(dados_candidato)
             except Exception as e:
-                print(f"Erro ao avaliar prioridade: {e}")
+                print(f"Error evaluating priority: {e}")
         
-        # Avalia classificação (só se for elegível)
+        # Evaluate classification (only if eligible)
         if resultados["elegivel"] and self.regra_classificacao:
             try:
                 rule = rule_engine.Rule(self.regra_classificacao)
                 resultados["classificacao"] = rule.matches(dados_candidato)
             except Exception as e:
-                print(f"Erro ao avaliar classificação: {e}")
+                print(f"Error evaluating classification: {e}")
         
         return resultados
     
     class Meta:
-        verbose_name = "Exemplo 5: Múltiplas Regras"
+        verbose_name = "Example 5: Multiple Rules"
+```
 
+## Examples of common rules you can use:
 
-# Exemplos de regras comuns que você pode usar:
+> RULE EXAMPLES:
 
-"""
-EXEMPLOS DE REGRAS:
-
-1. Validação de Idade:
+1. Age Validation:
    - age >= 18
    - age >= 18 and age <= 65
    - age < 18 or age > 65
 
-2. Validação de Email:
+2. Email Validation:
    - "@ifrn.edu.br" in email
    - email.endswith("@edu.br")
    - not ("@gmail.com" in email)
 
-3. Validação de Status:
+3. Status Validation:
    - status == "ativo"
    - status in ["ativo", "pendente"]
    - status != "inativo"
 
-4. Regras Compostas:
+4. Composite Rules:
    - age >= 18 and status == "ativo"
    - (price > 100 or quantity >= 5) and customer_type == "premium"
    - level >= 5 and (points > 1000 or vip == true)
 
-5. Operações Matemáticas:
+5. Mathematical Operations:
    - price * quantity > 1000
    - (total - discount) >= 100
    - abs(balance) < 50
 
-6. Funções:
+6. Functions:
    - len(name) > 3
    - max(value1, value2) > 100
    - min(price1, price2) < 50
@@ -254,8 +252,7 @@ EXEMPLOS DE REGRAS:
    - code.endswith("2024")
    - "palavra" in description
 
-8. Booleanos:
+8. Booleans:
    - is_active and not is_suspended
    - has_permission or is_admin
    - approved and verified
-"""

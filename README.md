@@ -34,10 +34,15 @@ class MyModel(models.Model):
 
 ## 📚 Documentation
 
-- **[INDEX.md](INDEX.md)** - Complete documentation index
-- **[INSTALL.md](INSTALL.md)** - Installation guide
-- **[QUICKSTART.md](QUICKSTART.md)** - Quick start (5 min)
-- **[examples/examples.py](examples/examples.py)** - Code examples
+- 
+
+1. **[INDEX.md](INDEX.md)** - Complete documentation index
+2. **[INSTALL.md](INSTALL.md)** - Installation guide
+3. **[QUICKSTART.md](QUICKSTART.md)** - Quick start (5 min)
+4. **[MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)** - Migration guide
+5. **[EXAMPLES.md](EXAMPLES.md)** - Code examples
+6. **[VISUAL_DEMO.py](VISUAL_DEMO.md)** - Demonstração Visual
+
 
 ## 🎯 Implementation Example
 
@@ -51,12 +56,12 @@ class Cohort(Model):
         blank=True,
         null=True,
         example_data={
-            "login": "usuario123",
-            "user": {"email": "usuario@example.com"},
-            "name": "João da Silva",
-            "status": "Ativo"
+            "login": "user123",
+            "user": {"email": "user@example.com"},
+            "name": "Zé da Silva",
+            "active": True
         },
-        default="login == 'usuario123' and user.email != 'usuario123@example.com'",
+        default="login == 'user123' and user.email != 'user123@example.com'",
     )
 
     class Meta:
@@ -67,13 +72,3 @@ class Cohort(Model):
     def __str__(self):
         return self.name
 ```
-
-## 📖 Learn More
-
-For detailed information, visit:
-
-👉 **[Complete RuleField Documentation](INDEX.md)**
-
----
-
-**Created for AVA Project - IFRN**
