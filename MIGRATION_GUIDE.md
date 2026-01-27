@@ -451,7 +451,7 @@ python manage.py collectstatic --clear --noinput
 **Solução:**
 1. Verifique se URL foi adicionada em `urls.py`
 2. Verifique namespace correto
-3. Teste endpoint: `curl -X POST http://localhost:8000/api/validate-rule/`
+3. Teste endpoint: `curl -X POST http://localhost:8091/api/validate-rule/`
 
 ---
 
