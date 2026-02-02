@@ -1,6 +1,7 @@
 """Django field for rule-engine rules."""
 
 import json
+from typing import Any, Union, Dict, List
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -87,3 +88,40 @@ class RuleField(models.TextField):
         if value is None:
             return value
         return str(value)
+    
+    def matches(self, data: Union[None, bool, int, float, str, List, Dict]) -> bool:
+        """
+        Valida se uma regra matches com um dado fornecido.
+        
+        Args:
+            data (Any): Os dados a validar. Pode ser None, primitivos JSON, list ou dict.
+        
+        Returns:
+            bool: True se a regra matches com o dado, False caso contrário.
+        
+        Raises:
+            ValidationError: Se a regra for inválida.
+            Exception: Se houver erro ao avaliar a regra com os dados fornecidos.
+        
+        Example:
+            field = RuleField(default="age >= 18")
+            result = field.matches({"age": 25})  # True
+            result = field.matches({"age": 15})  # False
+        """
+        # Usa o valor/default do field
+        rule_str = getattr(self, 'value', None) or self.default
+        
+        if not rule_str:
+            return True
+        
+        try:
+            rule = rule_engine.Rule(rule_str)
+            return rule.matches(data)
+        except rule_engine.RuleError as e:
+            raise ValidationError(
+                _('Regra inválida: %(error)s'),
+                code='invalid_rule',
+                params={'error': str(e)},
+            )
+        except Exception as e:
+            raise Exception(f'Erro ao avaliar a regra: {str(e)}')

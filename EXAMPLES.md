@@ -213,6 +213,96 @@ class Exemplo5_MultiplaRegras(models.Model):
         verbose_name = "Example 5: Multiple Rules"
 ```
 
+## Rule.matches() Method
+
+The `matches()` method validates if a rule matches a given data structure. It accepts any JSON-compatible data type.
+
+### Method Signature
+
+```python
+rule.matches(data: Any) -> bool
+```
+
+### Parameters
+
+- **data** (Any): The data to validate against the rule. Can be:
+  - `None`
+  - JSON primitives: `str`, `int`, `float`, `bool`
+  - `list`: List of any supported types
+  - `dict`: Dictionary with string keys and any supported values
+
+### Return Value
+
+- **bool**: `True` if the data matches the rule, `False` otherwise
+
+### Usage Examples
+
+```python
+from rule_engine import Rule
+
+# Simple rule with primitive
+rule = Rule("age >= 18")
+result = rule.matches({"age": 25})  # True
+result = rule.matches({"age": 15})  # False
+
+# Rule with None
+rule = Rule("value is None")
+result = rule.matches(None)  # True
+
+# Rule with list
+rule = Rule("len(items) > 2")
+result = rule.matches({"items": [1, 2, 3]})  # True
+result = rule.matches({"items": [1]})  # False
+
+# Complex nested data
+rule = Rule('user["status"] == "ativo" and user["age"] >= 18')
+result = rule.matches({
+    "user": {
+        "status": "ativo",
+        "age": 25
+    }
+})  # True
+
+# Rule with string operations
+rule = Rule('email.endswith("@ifrn.edu.br")')
+result = rule.matches({"email": "joao@ifrn.edu.br"})  # True
+result = rule.matches({"email": "joao@gmail.com"})  # False
+
+# Multiple conditions
+rule = Rule('(price > 100 or quantity >= 5) and category == "premium"')
+result = rule.matches({
+    "price": 150,
+    "quantity": 3,
+    "category": "premium"
+})  # True
+
+# Rule with None handling
+rule = Rule('value is not None and value > 0')
+result = rule.matches({"value": None})  # False
+result = rule.matches({"value": 10})  # True
+result = rule.matches({"value": -5})  # False
+```
+
+### Exception Handling
+
+The `matches()` method may raise exceptions if:
+- The rule syntax is invalid
+- The data structure doesn't provide required fields
+- Type mismatches occur during evaluation
+
+Always wrap in try-except for production code:
+
+```python
+rule = Rule(rule_string)
+try:
+    if rule.matches(data):
+        # Rule matched
+        pass
+except Exception as e:
+    print(f"Error evaluating rule: {e}")
+    # Handle error appropriately
+```
+
 ## Examples of common rules you can use:
 
 > RULE EXAMPLES:
