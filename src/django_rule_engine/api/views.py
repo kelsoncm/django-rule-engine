@@ -1,10 +1,13 @@
 """API views for rule validation."""
 
 import json
+import logging
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import ensure_csrf_cookie
 import rule_engine
+
+logger = logging.getLogger(__name__)
 
 
 @require_http_methods(["POST"])
@@ -50,10 +53,11 @@ def validate_rule(request):
         # Compila a regra
         try:
             rule = rule_engine.Rule(rule_text)
-        except Exception as e:
+        except Exception:
+            logger.exception("Erro ao compilar regra")
             return JsonResponse({
                 'valid': False,
-                'error': f'Erro ao compilar regra: {str(e)}'
+                'error': 'Erro ao compilar regra'
             }, status=400)
         
         # Avalia a regra com os dados fornecidos
@@ -67,19 +71,21 @@ def validate_rule(request):
                 'rule': rule_text,
                 'data': data
             })
-        except Exception as e:
+        except Exception:
+            logger.exception("Erro ao avaliar regra")
             return JsonResponse({
                 'valid': False,
-                'error': f'Erro ao avaliar regra: {str(e)}'
+                'error': 'Erro ao avaliar regra'
             }, status=400)
     
-    except json.JSONDecodeError as e:
+    except json.JSONDecodeError:
         return JsonResponse({
             'valid': False,
-            'error': f'JSON inválido: {str(e)}'
+            'error': 'JSON inválido'
         }, status=400)
-    except Exception as e:
+    except Exception:
+        logger.exception("Erro interno ao validar regra")
         return JsonResponse({
             'valid': False,
-            'error': f'Erro interno: {str(e)}'
+            'error': 'Erro interno'
         }, status=500)
