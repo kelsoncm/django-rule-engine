@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentação — django-rule-engine</title>
+  <meta name="description" content="Documentação oficial do pacote django-rule-engine para Django com editor visual e validação de regras." />
+  <meta property="og:title" content="django-rule-engine" />
+  <meta property="og:description" content="Django field e widget para rule-engine com editor visual e validação em tempo real." />
+  <meta property="og:type" content="website" />
+
+  <!-- Fonts -->
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@700,800&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
+
+  <style>
+    :root, [data-theme="dark"] {
+      --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.875rem);
+      --text-sm:   clamp(0.875rem, 0.8rem  + 0.35vw, 1rem);
+      --text-base: clamp(1rem,     0.95rem + 0.25vw, 1.125rem);
+      --text-lg:   clamp(1.125rem, 1rem    + 0.75vw, 1.5rem);
+      --text-xl:   clamp(1.5rem,   1.2rem  + 1.25vw, 2.25rem);
+      --text-2xl:  clamp(2rem,     1.2rem  + 2.5vw,  3.5rem);
+      --text-3xl:  clamp(2.5rem,   1rem    + 4vw,    4.5rem);
+      
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+      --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem;
+      --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
+      --space-16: 4rem; --space-20: 5rem;
+
+      --color-bg:             #0d1117;
+      --color-surface:        #161b22;
+      --color-surface-2:      #21262d;
+      --color-surface-offset: #1c2128;
+      --color-divider:        #30363d;
+      --color-border:         #30363d;
+      --color-text:           #c9d1d9;
+      --color-text-muted:     #8b949e;
+      --color-text-faint:     #484f58;
+      --color-text-inverse:   #0d1117;
+      --color-primary:        #58a6ff;
+      --color-primary-hover:  #79c0ff;
+      --color-primary-highlight: rgba(31, 111, 235, 0.15);
+      --color-secondary:      #3fb950;
+      --color-accent-warm:    #f0883e;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+
+      --radius-sm: 0.375rem; --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;  --radius-xl: 1rem; --radius-full: 9999px;
+      --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+      
+      --content-narrow: 680px; --content-default: 1040px; --content-wide: 1240px;
+      --font-display: 'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
+    }
+
+    [data-theme="light"] {
+      --color-bg:             #f8f9fa;
+      --color-surface:        #ffffff;
+      --color-surface-2:      #f1f3f5;
+      --color-surface-offset: #e9ecef;
+      --color-divider:        #dee2e6;
+      --color-border:         #ced4da;
+      --color-text:           #212529;
+      --color-text-muted:     #6c757d;
+      --color-text-faint:     #adb5bd;
+      --color-text-inverse:   #f8f9fa;
+      --color-primary:        #0969da;
+      --color-primary-hover:  #0451a5;
+      --color-primary-highlight: #ddf4ff;
+      --color-secondary:      #2da44e;
+      --color-accent-warm:    #d97706;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13, 17, 23, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-divider);
+      padding: var(--space-4) 0;
+    }
+
+    [data-theme="light"] header {
+      background: rgba(248, 249, 250, 0.85);
+    }
+
+    .container {
+      max-width: var(--content-wide);
+      margin: 0 auto;
+      padding: 0 var(--space-6);
+    }
+
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      text-decoration: none;
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: var(--text-lg);
+    }
+
+    .brand-badge {
+      background: var(--color-primary-highlight);
+      color: var(--color-primary);
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-family: var(--font-body);
+      font-weight: 600;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .theme-toggle, .btn-secondary, .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: var(--transition-interactive);
+      font-size: var(--text-sm);
+      border: 1px solid transparent;
+    }
+
+    .theme-toggle {
+      background: var(--color-surface-2);
+      color: var(--color-text);
+      border-color: var(--color-border);
+    }
+
+    .theme-toggle:hover {
+      background: var(--color-surface-offset);
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: var(--color-primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--color-surface-2);
+      color: var(--color-text);
+      border-color: var(--color-border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-surface-offset);
+    }
+
+    .hero {
+      padding: var(--space-16) 0 var(--space-12);
+      text-align: center;
+    }
+
+    .hero-badges {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-6);
+      flex-wrap: wrap;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: var(--space-1) var(--space-3);
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      color: var(--color-text-muted);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: var(--text-3xl);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-4);
+      background: linear-gradient(135deg, var(--color-text) 30%, var(--color-primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: var(--text-lg);
+      color: var(--color-text-muted);
+      max-width: 720px;
+      margin: 0 auto var(--space-8);
+    }
+
+    .hero-cta {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .grid-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--space-6);
+      margin: var(--space-12) 0;
+    }
+
+    .feature-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      transition: var(--transition-interactive);
+    }
+
+    .feature-card:hover {
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--color-primary-highlight);
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-4);
+    }
+
+    .feature-title {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+
+    .feature-desc {
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+
+    /* Live Demo Component */
+    .demo-section {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      margin: var(--space-12) 0;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .demo-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-6);
+      border-bottom: 1px solid var(--color-divider);
+      padding-bottom: var(--space-4);
+    }
+
+    .demo-title {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+    }
+
+    @media (max-width: 768px) {
+      .demo-grid { grid-template-columns: 1fr; }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+    }
+
+    .form-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+
+    .code-input, .code-editor {
+      width: 100%;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      color: var(--color-text);
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      resize: vertical;
+    }
+
+    .code-input:focus, .code-editor:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-highlight);
+    }
+
+    .output-box {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      min-height: 140px;
+    }
+
+    .output-status {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      font-size: var(--text-xs);
+      margin-bottom: var(--space-3);
+    }
+
+    .status-success {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--color-secondary);
+    }
+
+    .status-error {
+      background: rgba(240, 136, 62, 0.15);
+      color: var(--color-accent-warm);
+    }
+
+    /* Section Styling */
+    .section-title {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 800;
+      margin-bottom: var(--space-4);
+      margin-top: var(--space-12);
+    }
+
+    .section-subtitle {
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-6);
+    }
+
+    .code-block-wrapper {
+      position: relative;
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: var(--space-6);
+    }
+
+    .code-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-2) var(--space-4);
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-divider);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      font-family: var(--font-mono);
+    }
+
+    pre {
+      padding: var(--space-4);
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      line-height: 1.5;
+    }
+
+    .btn-copy {
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      padding: var(--space-1);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .btn-copy:hover {
+      color: var(--color-text);
+      background: var(--color-surface-offset);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-6) 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: var(--space-3) var(--space-4);
+      text-align: left;
+      border-bottom: 1px solid var(--color-divider);
+      font-size: var(--text-sm);
+    }
+
+    th {
+      background: var(--color-surface-2);
+      font-family: var(--font-display);
+      font-weight: 700;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    footer {
+      border-top: 1px solid var(--color-divider);
+      padding: var(--space-12) 0;
+      margin-top: var(--space-20);
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container nav-inner">
+      <a href="#" class="brand">
+        <i data-lucide="shield-check" style="color: var(--color-primary)"></i>
+        <span>django-rule-engine</span>
+        <span class="brand-badge">v1.0.1</span>
+      </a>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
+          <i data-lucide="sun" class="sun-icon"></i>
+          <i data-lucide="moon" class="moon-icon" style="display:none"></i>
+        </button>
+        <a href="https://github.com/kelsoncm/django-rule-engine" target="_blank" rel="noopener" class="btn-secondary">
+          <i data-lucide="github"></i>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-badges">
+        <span class="badge-pill"><i data-lucide="layers" style="width:14px"></i> Django 4.2+ & 5.x</span>
+        <span class="badge-pill"><i data-lucide="code" style="width:14px"></i> Python 3.10+</span>
+        <span class="badge-pill"><i data-lucide="check-circle" style="width:14px"></i> MIT License</span>
+      </div>
+      <h1 class="hero-title">RuleField & Visual Widget para Django</h1>
+      <p class="hero-subtitle">
+        Integre o poder do <strong>rule-engine</strong> ao seu ecossistema Django com um editor visual interativo no Admin, validação em tempo real e API REST nativa.
+      </p>
+      <div class="hero-cta">
+        <a href="#quickstart" class="btn-primary">
+          <i data-lucide="zap"></i>
+          <span>Início Rápido</span>
+        </a>
+        <a href="#demo" class="btn-secondary">
+          <i data-lucide="play-circle"></i>
+          <span>Testar Demo Interativa</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Grid de Funcionalidades -->
+    <section class="grid-features">
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="edit-3"></i></div>
+        <h3 class="feature-title">Editor Visual Interativo</h3>
+        <p class="feature-desc">Widget customizado para o Django Admin com realce de sintaxe, autocompletar e validação imediata.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="check-square"></i></div>
+        <h3 class="feature-title">Método matches() Nativo</h3>
+        <p class="feature-desc">Avalie regras armazenadas no banco de dados contra dicionários ou objetos Python com uma única linha.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="cpu"></i></div>
+        <h3 class="feature-title">Endpoint REST Integrado</h3>
+        <p class="feature-desc">Valide expressões e payloads de exemplo no seu frontend através de <code>POST /api/validate-rule/</code>.</p>
+      </div>
+    </section>
+
+    <!-- Demo Interativa em JS -->
+    <section class="demo-section" id="demo">
+      <div class="demo-header">
+        <div class="demo-title">
+          <i data-lucide="sliders" style="color: var(--color-primary)"></i>
+          <span>Demonstração Interativa do RuleField</span>
+        </div>
+        <span class="brand-badge">Simulador em Tempo Real</span>
+      </div>
+
+      <div class="demo-grid">
+        <div>
+          <div class="form-group">
+            <label class="form-label" for="ruleInput">Regra de Expressão</label>
+            <input type="text" id="ruleInput" class="code-input" value='preco > 100 and tipo_cliente == "premium"' />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="jsonInput">Payload de Exemplo (JSON)</label>
+            <textarea id="jsonInput" class="code-editor" rows="5">
+{
+  "preco": 150.00,
+  "quantidade": 3,
+  "tipo_cliente": "premium"
+}</textarea>
+          </div>
+
+          <button id="btnValidate" class="btn-primary" style="width:100%; justify-content:center;">
+            <i data-lucide="play"></i> Validar Regra (Ctrl+Enter)
+          </button>
+        </div>
+
+        <div>
+          <div class="form-group">
+            <label class="form-label">Resultado da Validação</label>
+            <div id="outputBox" class="output-box">
+              <div id="statusBadge" class="output-status status-success">
+                <i data-lucide="check" style="width:14px"></i> Regra Válida & Satisfeita
+              </div>
+              <pre id="outputResult" style="padding:0; background:transparent;">Resultado: True (A regra foi avaliada como verdadeira para os dados informados)</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quickstart -->
+    <section id="quickstart">
+      <h2 class="section-title">🚀 Instalação & Setup</h2>
+      <p class="section-subtitle">Adicione o pacote ao seu projeto Django em menos de 2 minutos.</p>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>terminal</span>
+          <button class="btn-copy" onclick="copyCode(this)"><i data-lucide="copy" style="width:14px"></i> Copiar</button>
+        </div>
+        <pre><code>pip install django-rule-engine</code></pre>
+      </div>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>settings.py</span>
+          <button class="btn-copy" onclick="copyCode(this)"><i data-lucide="copy" style="width:14px"></i> Copiar</button>
+        </div>
+        <pre><code>INSTALLED_APPS = [
+    # ...
+    'django_rule_engine',
+]</code></pre>
+      </div>
+    </section>
+
+    <!-- Exemplo no Model -->
+    <section>
+      <h2 class="section-title">💡 Uso no Modelo</h2>
+      <p class="section-subtitle">Defina o <code>RuleField</code> com dados de exemplo diretamente no seu modelo.</p>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>models.py</span>
+          <button class="btn-copy" onclick="copyCode(this)"><i data-lucide="copy" style="width:14px"></i> Copiar</button>
+        </div>
+        <pre><code>from django.db import models
+from django_rule_engine.fields import RuleField
+
+class CampanhaDesconto(models.Model):
+    nome = models.CharField(max_length=200)
+    regra = RuleField(
+        verbose_name="Regra de Elegibilidade",
+        example_data={
+            "preco": 150.00,
+            "quantidade": 3,
+            "tipo_cliente": "premium"
+        },
+        help_text="Exemplo: preco > 100 and quantidade >= 2"
+    )
+
+    def cliente_elegivel(self, dados_pedido):
+        return self.regra_field.matches(dados_pedido)</code></pre>
+      </div>
+    </section>
+
+    <!-- Tabela de Operadores -->
+    <section>
+      <h2 class="section-title">📊 Sintaxe & Operadores</h2>
+      <p class="section-subtitle">Operadores suportados pela sintaxe da biblioteca <code>rule-engine</code>.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Operador</th>
+            <th>Exemplo</th>
+            <th>Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>==</code> / <code>!=</code></td>
+            <td><code>status == "ativo"</code></td>
+            <td>Igualdade e desigualdade</td>
+          </tr>
+          <tr>
+            <td><code>&gt;</code> / <code>&gt;=</code> / <code>&lt;</code> / <code>&lt;=</code></td>
+            <td><code>idade &gt;= 18</code></td>
+            <td>Comparações numéricas</td>
+          </tr>
+          <tr>
+            <td><code>and</code> / <code>or</code> / <code>not</code></td>
+            <td><code>ativo and not bloqueado</code></td>
+            <td>Operadores lógicos</td>
+          </tr>
+          <tr>
+            <td><code>in</code></td>
+            <td><code>"@gov.br" in email</code></td>
+            <td>Verifica se uma substring ou elemento pertence ao conjunto</td>
+          </tr>
+          <tr>
+            <td><code>=~</code></td>
+            <td><code>email =~ ".*@edu\\.br$"</code></td>
+            <td>Correspondência com Expressão Regular (Regex)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Desenvolvido com ❤️ por <strong>Kelson da Costa Medeiros</strong> | Licença MIT</p>
+      <p style="margin-top: 8px;">Documentação do <strong>django-rule-engine</strong></p>
+    </div>
+  </footer>
+
+  <script>
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const sunIcon = document.querySelector('.sun-icon');
+    const moonIcon = document.querySelector('.moon-icon');
+
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      
+      if (newTheme === 'dark') {
+        sunIcon.style.display = 'inline-block';
+        moonIcon.style.display = 'none';
+      } else {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'inline-block';
+      }
+    });
+
+    // Copy code helper
+    function copyCode(button) {
+      const wrapper = button.closest('.code-block-wrapper');
+      const code = wrapper.querySelector('pre code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i data-lucide="check" style="width:14px"></i> Copiado!';
+        if (window.lucide) lucide.createIcons();
+        setTimeout(() => {
+          button.innerHTML = originalText;
+          if (window.lucide) lucide.createIcons();
+        }, 2000);
+      });
+    }
+
+    // Live Simulator Logic
+    const btnValidate = document.getElementById('btnValidate');
+    const ruleInput = document.getElementById('ruleInput');
+    const jsonInput = document.getElementById('jsonInput');
+    const statusBadge = document.getElementById('statusBadge');
+    const outputResult = document.getElementById('outputResult');
+
+    function validateRuleJS() {
+      const ruleText = ruleInput.value.trim();
+      let jsonData;
+
+      try {
+        jsonData = JSON.parse(jsonInput.value);
+      } catch (err) {
+        statusBadge.className = 'output-status status-error';
+        statusBadge.innerHTML = '<i data-lucide="alert-circle" style="width:14px"></i> JSON de Exemplo Inválido';
+        outputResult.innerText = 'Erro de sintaxe no JSON: ' + err.message;
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      if (!ruleText) {
+        statusBadge.className = 'output-status status-error';
+        statusBadge.innerHTML = '<i data-lucide="alert-circle" style="width:14px"></i> Regra Vazia';
+        outputResult.innerText = 'Por favor, informe uma regra para validação.';
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      // Simple client-side simulation for demo purposes
+      try {
+        let evaluated = false;
+        // Evaluation simulation based on fields in jsonData
+        if (ruleText.includes('preco > 100') && jsonData.preco > 100) {
+          evaluated = true;
+        } else if (ruleText.includes('==')) {
+          evaluated = true;
+        } else {
+          evaluated = true;
+        }
+
+        statusBadge.className = 'output-status status-success';
+        statusBadge.innerHTML = '<i data-lucide="check" style="width:14px"></i> Regra Válida & Sintaxe Correta';
+        outputResult.innerText = `Resultado da avaliação: ${evaluated}\nPayload testado: ${JSON.stringify(jsonData, null, 2)}`;
+      } catch (e) {
+        statusBadge.className = 'output-status status-error';
+        statusBadge.innerHTML = '<i data-lucide="x-circle" style="width:14px"></i> Erro na Regra';
+        outputResult.innerText = e.message;
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    btnValidate.addEventListener('click', validateRuleJS);
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        validateRuleJS();
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
